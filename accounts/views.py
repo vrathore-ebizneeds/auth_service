@@ -1,3 +1,12 @@
-from django.shortcuts import render
+from django.http import JsonResponse
+from rest_framework import generics
+from .models import User
+from .serializers import UserSerializer
 
-# Create your views here.
+def hello(request):
+    return JsonResponse({"message":"accounts working!"})
+
+
+class UserListCreateView(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
