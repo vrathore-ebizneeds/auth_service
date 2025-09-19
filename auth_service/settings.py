@@ -26,7 +26,9 @@ SECRET_KEY = 'django-insecure-b68c6&us7ru4tqczcsav#s8*p(11$o4e)l*0sjmbkdr7vkq@e4
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+
+
+ALLOWED_HOSTS = ["*"]
 
 AUTH_USER_MODEL = 'accounts.User'
 
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'accounts',
     'drf_spectacular',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 MIDDLEWARE = [

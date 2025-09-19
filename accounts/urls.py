@@ -8,12 +8,13 @@ from drf_spectacular.views import (SpectacularAPIView, SpectacularSwaggerView, S
 urlpatterns = [
     path('hello/', views.hello, name='hello'),
     path('users/', views.UserListCreateView.as_view(), name='user-list-create'),
+    path('me/', views.UserProfileView.as_view(), name='user-profile'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('register/', views.UserRegisterView.as_view(), name='user-register'),
     path('change-password/', views.ChangePasswordView.as_view(), name='change-password'),
-    # API-first password reset (no CSRF required)
+ 
     path('password-reset/'       , views.PasswordResetRequestAPI.as_view(), name='password_reset'),
     path('reset/<uidb64>/<token>/', views.PasswordResetConfirmAPI.as_view(), name='password_reset_confirm'),
     path('api/schema/', SpectacularAPIView.as_view(), name="schema"),
