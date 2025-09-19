@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'accounts',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -135,7 +137,23 @@ REST_FRAMEWORK={
     "DEFAULT_AUTHENTICATION_CLASSES":[
         "rest_framework.authentication.BasicAuthentication",
         "rest_framework_simplejwt.authentication.JWTAuthentication"
-    ]
+    ],
+    "DEFAULT_SCHEMA_CLASS":"drf_spectacular.openapi.AutoSchema",
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME":timedelta(minutes=300),
+    "REFRESH_TOKEN_LIFETIME":timedelta(days=7),
+    "ROTATE_REFRESH_TOKEN":True,
+    "BLACKLIST_AFTER_ROTATION":True,
+    "AUTH_HEADER_TYPES":("Bearer",),
+}
+
+SPECTACULAR_SETTINGS = {
+    "TITLE":"Common Auth Service",
+    "DESCRIPTION":"A common authentication service",
+    "VERSION":"0.1.0",
+    "SERVE_INCLUDE_SCHEMA":False,
+}
