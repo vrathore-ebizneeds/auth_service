@@ -11,13 +11,12 @@ from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import User
-from .serializers import ChangePasswordSerializer, UserSerializer
+from .serializers import ChangePasswordSerializer, UserSerializer, UserProfileSerializer, LogoutSerializer
+from accounts import serializers
 
 
 def hello(request):
-
     return JsonResponse({"message":"accounts working!"})
-
 
 class UserListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
@@ -52,28 +51,6 @@ class ChangePasswordView(generics.UpdateAPIView):
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    
-    # def post(self, request, *args, **kwargs):
-    #     serializer = ChangePasswordSerializer(data=request.data)
-
-    #     if serializer.is_valid():
-    #         user = request.user
-
-    #         if not user.check_password(serializer.validated_data['old_password']):
-    #             return Response({'old_password':'wrong password'}, status=status.HTTP_400_BAD_REQUEST)
-
-    #         user.set_password(serializer.validated_data['new_password'])
-    #         user.save()
-
-    #         update_session_auth_hash(request, user)
-
-    #         return Response({'detail':'Password updated successfully'}, status=status.HTTP_200_OK)
-
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
 class PasswordResetRequestAPI(APIView):
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
@@ -86,13 +63,13 @@ class PasswordResetRequestAPI(APIView):
         try:
             user = User.objects.get(email=email)
         except User.DoesNotExist:
-            # Do not reveal whether the email exists
+           
             return Response({'detail': 'If the email exists, a reset link has been sent.'}, status=status.HTTP_200_OK)
 
         uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
         token = default_token_generator.make_token(user)
 
-        # Optionally send email; for dev you can inspect uid/token in response
+       
         reset_link = f"{request.build_absolute_uri('/accounts/reset/')}{uidb64}/{token}/"
         try:
             send_mail(
@@ -106,7 +83,6 @@ class PasswordResetRequestAPI(APIView):
             pass
 
         return Response({'detail': 'If the email exists, a reset link has been sent.', 'uidb64': uidb64, 'token': token}, status=status.HTTP_200_OK)
-
 
 class PasswordResetConfirmAPI(APIView):
     permission_classes = [permissions.AllowAny]
@@ -133,3 +109,20 @@ class PasswordResetConfirmAPI(APIView):
         user.save()
         return Response({'detail': 'Password has been reset successfully.'}, status=status.HTTP_200_OK)
 
+class UserProfileView(generics.RetrieveUpdateAPIView):
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user
+
+class LogoutView(generics.GenericAPIView):
+    serializer_class = LogoutSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)

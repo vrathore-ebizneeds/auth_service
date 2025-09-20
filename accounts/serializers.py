@@ -2,12 +2,13 @@ from dataclasses import field
 from rest_framework import serializers
 from .models import User
 from django.contrib.auth.password_validation import validate_password
-
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id','username','email','first_name','last_name','password']
+        # read_only_fields = ['id',  'email']
         extra_kwargs = {'password':{'write_only':True}}
 
     def create(self, validated_data):
@@ -30,4 +31,26 @@ class ChangePasswordSerializer(serializers.Serializer):
         if attrs['new_password'] != attrs['confirm_new_password']:
             raise serializers.ValidationError({'confirm_new_password':'passwords must match'})
         return attrs
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id','username','email','first_name','last_name','password']
+        read_only_fields = ['id', 'username', 'email']
+        extra_kwargs = {'password':{'write_only':True}}
+
+class LogoutSerializer(serializers.Serializer):
+    refresh = serializers.CharField()
+
+    default_error_messages = {"bad_token":"Token is invalid or expired."}
+
+    def validate(self, attrs):
+        self.token = attrs['refresh']
+        return attrs
+
+    def save(self, **kwargs):
+        try:
+            RefreshToken(self.token).blacklist()
+        except TokenError:
+            self.fail("bad_token")
 
