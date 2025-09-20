@@ -17,7 +17,9 @@ urlpatterns = [
  
     path('password-reset/'       , views.PasswordResetRequestAPI.as_view(), name='password_reset'),
     path('reset/<uidb64>/<token>/', views.PasswordResetConfirmAPI.as_view(), name='password_reset_confirm'),
-    path('api/schema/', SpectacularAPIView.as_view(), name="schema"),
-    path('api/docs/swagger/', SpectacularSwaggerView.as_view(url_name="schema"), name="swagger_ui"),
-    path('api/docs/redoc/', SpectacularRedocView.as_view(url_name="schema"), name="redoc")
+    path('schema/', SpectacularAPIView.as_view(), name="schema"),
+    path('docs/swagger/', SpectacularSwaggerView.as_view(url_name="schema"), name="swagger_ui"),
+    path('docs/redoc/', SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+
+    path('logout/', views.LogoutView.as_view(), name='logout')
 ]
